@@ -67,3 +67,32 @@ test('incoming praise updates personal jelly balance and temperature',async({pag
  await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','37.7');
  await page.screenshot({path:'/tmp/maeum-profile.png',fullPage:true});
 });
+test('praise highlights slide left, pause, open detail, and respect reduced motion',async({page})=>{
+ await page.goto('/#send');
+ const cards=page.locator('.stream-card:not([aria-hidden])');
+ await expect(cards).toHaveCount(4);
+ const ids=await cards.evaluateAll(items=>items.map(x=>x.dataset.streamPraise));
+ expect(new Set(ids).size).toBe(4);expect(ids.sort()).toEqual(['s1','s2','s3','s4']);
+ const track=page.locator('.stream-track');
+ await page.mouse.move(0,0);
+ const offset=()=>track.evaluate(el=>new DOMMatrix(getComputedStyle(el).transform).m41);
+ const initial=await offset();await expect.poll(offset).toBeLessThan(initial-3);
+ await page.locator('#stream-toggle').click();await page.mouse.move(0,0);
+ await expect(track).toHaveCSS('animation-play-state','paused');
+ await cards.first().click();await expect(page.getByRole('dialog')).toContainText('프로님이 전한 마음');
+ await expect(page.locator('.stream-full-message p')).not.toBeEmpty();await page.keyboard.press('Escape');
+ await page.locator('#stream-toggle').click();await page.mouse.move(0,0);
+ await expect(track).toHaveCSS('animation-play-state','running');
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await expect(track).toHaveCSS('animation-name','none');
+ await expect(page.locator('.stream-group[aria-hidden=true]')).toBeHidden();
+ await expect(page.locator('#stream-toggle')).toBeHidden();
+ await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+test('praise banner handles empty history and a single saved praise without changing totals',async({page})=>{
+ await page.evaluate(()=>localStorage.setItem('maeum-praises','[]'));await page.reload();
+ await expect(page.locator('.praise-stream')).toHaveCount(0);await expect(page.locator('#send-praise')).toBeVisible();
+ await page.evaluate(p=>localStorage.setItem('maeum-praises',JSON.stringify([p])),seedPraises[0]);await page.reload();
+ await expect(page.locator('.stream-card:not([aria-hidden])')).toHaveCount(1);
+ await page.locator('[data-nav="my"]').first().click();await expect(page.locator('.summary-stat').first().locator('strong')).toHaveText('1개');await expect(page.locator('.history-card')).toHaveCount(1);
+});
