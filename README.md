@@ -51,7 +51,7 @@ npm run test:e2e
 
 1. 저장소 **Settings → Pages**로 이동합니다.
 2. **Build and deployment → Source**에서 **Deploy from a branch**를 선택합니다.
-3. **Branch**를 **gh-pages**, 폴더를 **/ (root)**로 선택하고 **Save**합니다.
+3. **Branch**를 **gh-pages**, 폴더를 **/docs**로 선택하고 **Save**합니다. (`/ (root)` 경로도 지원합니다.)
 4. Pages 화면에 표시되는 배포 완료 URL을 공유합니다. 기본 예상 주소는 `https://heestogram.github.io/monimo/`입니다. 실제 활성화·배포 완료 후 사용할 수 있습니다.
 
 `main`은 원본 코드, `gh-pages`는 빌드된 사이트를 보관합니다. `main` 수정만으로 배포 파일이 갱신되지는 않습니다. 디자인을 수정한 경우 `npm ci && npm run build`로 다시 빌드해 `gh-pages`에 반영해야 합니다.
