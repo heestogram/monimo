@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { seedPraises } from '../../src/data.js';
+test.beforeEach(async({page})=>{await page.goto('/');await page.locator('#login-id').fill('c123456');await page.locator('#login-pw').fill('demo1234');await page.getByRole('button',{name:'로그인',exact:true}).click();});
 test('search, live preview, send, persist, and profile reward update',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('/');
@@ -25,8 +27,8 @@ test('search, live preview, send, persist, and profile reward update',async({pag
  await page.locator('[data-nav="profile"]').first().click();
  await page.locator('#profile-search').fill('이준호');
  await page.locator('[data-profile-person="2"]').click();
- await expect(page.locator('.temperature-stat strong')).toContainText('33');
- await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','43.5');
+ await expect(page.locator('.temperature-stat strong')).toContainText('2');
+ await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','37.1');
  await expect(page.locator('.history-card').first()).toContainText('귀 기울여');
  await page.locator('[data-profile-tab="detail"]').click();
  await expect(page.locator('dd')).toContainText(['이준호','삼성카드 / 디지털서비스팀','프로','junho.lee@example.com','더 편리한 금융 서비스를 고민합니다.']);
@@ -34,7 +36,7 @@ test('search, live preview, send, persist, and profile reward update',async({pag
  await expect(page.locator('.schedule-view')).toContainText('공유된 일정이 없어요');
  await page.locator('[data-nav="my"]').first().click();
  await page.locator('[data-my-tab="jelly"]').click();
- await expect(page.locator('.jelly-row.total')).toContainText('240');
+ await expect(page.locator('.jelly-row.total')).toContainText('30');
  expect(errors).toEqual([]);
 });
 test('mobile layout and independent name search',async({page})=>{
@@ -54,14 +56,14 @@ test('desktop screenshot',async({page})=>{
 });
 test('incoming praise updates personal jelly balance and temperature',async({page})=>{
  await page.goto('/');
- await page.evaluate(()=>{const existing=JSON.parse(localStorage.getItem('maeum-praises')||'[]');localStorage.setItem('maeum-praises',JSON.stringify([{id:'incoming-demo',to:1,from:2,category:'thanks',design:'thanks',message:'프로젝트를 꼼꼼히 챙겨주셔서 정말 감사합니다.',date:new Date().toISOString()},...existing]));});
+ await page.evaluate(seed=>{const existing=JSON.parse(localStorage.getItem('maeum-praises')||'null')||seed;localStorage.setItem('maeum-praises',JSON.stringify([{id:'incoming-demo',to:1,from:2,category:'thanks',design:'thanks',message:'프로젝트를 꼼꼼히 챙겨주셔서 정말 감사합니다.',date:new Date().toISOString()},...existing]));},seedPraises);
  await page.goto('/#my');await page.reload();
- await expect(page.locator('.jelly-stat>strong')).toContainText('250');
- await expect(page.locator('.summary-stat').nth(0)).toContainText('25');
- await expect(page.locator('.summary-stat').nth(1)).toContainText('42.8');
+ await expect(page.locator('.jelly-stat>strong')).toContainText('40');
+ await expect(page.locator('.summary-stat').nth(0)).toContainText('4');
+ await expect(page.locator('.summary-stat').nth(1)).toContainText('37.7');
  await page.locator('[data-my-tab="jelly"]').click();
- await expect(page.locator('.jelly-row.total')).toContainText('250');
+ await expect(page.locator('.jelly-row.total')).toContainText('40');
  await page.locator('[data-nav="profile"]').first().click();
- await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','42.8');
+ await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','37.7');
  await page.screenshot({path:'/tmp/maeum-profile.png',fullPage:true});
 });
