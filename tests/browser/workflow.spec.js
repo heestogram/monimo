@@ -29,7 +29,7 @@ test('search, live preview, send, persist, and profile reward update',async({pag
  await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','43.5');
  await expect(page.locator('.history-card').first()).toContainText('귀 기울여');
  await page.locator('[data-profile-tab="detail"]').click();
- await expect(page.locator('dd')).toContainText(['이준호','삼성카드 / 디지털서비스팀','프로','junho.lee@samsung.com','더 편리한 금융 서비스를 고민합니다.']);
+ await expect(page.locator('dd')).toContainText(['이준호','삼성카드 / 디지털서비스팀','프로','junho.lee@example.com','더 편리한 금융 서비스를 고민합니다.']);
  await page.locator('[data-profile-tab="schedule"]').click();
  await expect(page.locator('.schedule-view')).toContainText('공유된 일정이 없어요');
  await page.locator('[data-nav="my"]').first().click();

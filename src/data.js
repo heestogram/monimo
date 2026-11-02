@@ -1,10 +1,10 @@
 export const employees = [
- {id:1,name:'김민지',department:'브랜드마케팅팀',role:'프로',initial:'민',color:'lavender',temp:42.5,count:24,jelly:240,description:'좋은 브랜드 경험을 함께 만들어갑니다.',email:'minji.kim@samsung.com'},
- {id:2,name:'이준호',department:'디지털서비스팀',role:'프로',initial:'준',color:'blue',temp:43.2,count:32,jelly:320,description:'더 편리한 금융 서비스를 고민합니다.',email:'junho.lee@samsung.com'},
- {id:3,name:'박서연',department:'브랜드마케팅팀',role:'프로',initial:'서',color:'pink',temp:41.8,count:18,jelly:180,description:'함께하는 일의 힘을 믿습니다.',email:'seoyeon.park@samsung.com'},
- {id:4,name:'정다은',department:'인재운영팀',role:'프로',initial:'다',color:'mint',temp:44.1,count:38,jelly:380,description:'서로의 성장을 응원합니다.',email:'daeun.jung@samsung.com'},
- {id:5,name:'최현우',department:'데이터전략팀',role:'프로',initial:'현',color:'peach',temp:40.6,count:16,jelly:160,description:'데이터에서 새로운 가능성을 찾습니다.',email:'hyunwoo.choi@samsung.com'},
- {id:6,name:'김지수',department:'디지털서비스팀',role:'프로',initial:'지',color:'blue',temp:42.0,count:21,jelly:210,description:'함께 고민하고, 함께 해결해요.',email:'jisoo.kim@samsung.com'}
+ {id:1,name:'김민지',department:'브랜드마케팅팀',role:'프로',initial:'민',color:'lavender',temp:42.5,count:24,jelly:240,description:'좋은 브랜드 경험을 함께 만들어갑니다.',email:'minji.kim@example.com'},
+ {id:2,name:'이준호',department:'디지털서비스팀',role:'프로',initial:'준',color:'blue',temp:43.2,count:32,jelly:320,description:'더 편리한 금융 서비스를 고민합니다.',email:'junho.lee@example.com'},
+ {id:3,name:'박서연',department:'브랜드마케팅팀',role:'프로',initial:'서',color:'pink',temp:41.8,count:18,jelly:180,description:'함께하는 일의 힘을 믿습니다.',email:'seoyeon.park@example.com'},
+ {id:4,name:'정다은',department:'인재운영팀',role:'프로',initial:'다',color:'mint',temp:44.1,count:38,jelly:380,description:'서로의 성장을 응원합니다.',email:'daeun.jung@example.com'},
+ {id:5,name:'최현우',department:'데이터전략팀',role:'프로',initial:'현',color:'peach',temp:40.6,count:16,jelly:160,description:'데이터에서 새로운 가능성을 찾습니다.',email:'hyunwoo.choi@example.com'},
+ {id:6,name:'김지수',department:'디지털서비스팀',role:'프로',initial:'지',color:'blue',temp:42.0,count:21,jelly:210,description:'함께 고민하고, 함께 해결해요.',email:'jisoo.kim@example.com'}
 ];
 export const categories = [{id:'together',label:'최고의 동료',emoji:'🤝',desc:'함께여서 든든해요'},{id:'thanks',label:'따뜻한 배려',emoji:'💙',desc:'작은 배려에 감사해요'},{id:'passion',label:'빛나는 열정',emoji:'✨',desc:'열정에 박수를 보내요'},{id:'idea',label:'멋진 아이디어',emoji:'💡',desc:'새로운 생각을 응원해요'}];
 export const designs = [{id:'thanks',label:'고마워요',title:'덕분에 참 든든해요',subtitle:'작은 배려가 큰 힘이 되었어요',theme:'sky',accessory:'heart'},{id:'best',label:'최고예요',title:'당신이 있어 빛나요',subtitle:'오늘도 멋진 당신에게 박수를!',theme:'cream',accessory:'star'},{id:'cheer',label:'응원해요',title:'언제나 응원할게요',subtitle:'우리 함께라면 해낼 수 있어요',theme:'lilac',accessory:'flag'},{id:'together',label:'함께해요',title:'함께라서 더 좋아요',subtitle:'앞으로도 좋은 동료가 되어주세요',theme:'mint',accessory:'flower'}];

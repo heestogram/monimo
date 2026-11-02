@@ -42,3 +42,20 @@ npm run test:e2e
 ## 실서비스 연결 시 필요한 작업
 
 사내 SSO 인증, 실제 조직도 조회, 서버 기반 칭찬 저장·공개 정책 및 권한 검사, 모니모 리워드 지급 API 연동이 필요합니다. 중복 지급 방지와 지급 실패 처리, 칭찬 노출/개인정보 정책도 서버에서 구현해야 합니다. 현재 일정 탭은 연동 전 빈 상태를 안내합니다.
+
+## 시연 링크 공유 · GitHub Pages
+
+사이트의 배포 결과물은 **`gh-pages` 브랜치**에 있습니다. 실제 직원 데이터와 외부 서비스 연결 없이 가상 데이터로 체험하는 정적 웹사이트입니다.
+
+최초 한 번, 저장소 관리자가 GitHub에서 다음을 설정해주세요.
+
+1. 저장소 **Settings → Pages**로 이동합니다.
+2. **Build and deployment → Source**에서 **Deploy from a branch**를 선택합니다.
+3. **Branch**를 **gh-pages**, 폴더를 **/ (root)**로 선택하고 **Save**합니다.
+4. Pages 화면에 표시되는 배포 완료 URL을 공유합니다. 기본 예상 주소는 `https://heestogram.github.io/monimo/`입니다. 실제 활성화·배포 완료 후 사용할 수 있습니다.
+
+`main`은 원본 코드, `gh-pages`는 빌드된 사이트를 보관합니다. `main` 수정만으로 배포 파일이 갱신되지는 않습니다. 디자인을 수정한 경우 `npm ci && npm run build`로 다시 빌드해 `gh-pages`에 반영해야 합니다.
+
+Vite의 상대 경로 설정으로 GitHub Pages의 `/monimo/` 하위 경로에서도 CSS·JavaScript·폰트가 로드됩니다. 각 방문자의 칭찬은 해당 브라우저에만 저장되므로 다른 방문자와 데이터를 공유하지 않습니다.
+
+Vercel을 사용하는 경우 GitHub 저장소를 Import하고 Framework Preset **Vite**, Build Command **npm run build**, Output Directory **dist**로 배포할 수도 있습니다. 별도의 비밀키나 환경 변수는 필요하지 않습니다.
