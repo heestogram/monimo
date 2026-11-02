@@ -1,0 +1,67 @@
+import { test, expect } from '@playwright/test';
+test('search, live preview, send, persist, and profile reward update',async({page})=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/');
+ await page.locator('#send-praise').click();
+ await expect(page.getByRole('status')).toContainText('동료를 선택');
+ await page.locator('#dept-search').fill('디지털서비스팀');
+ await expect(page.locator('.employee-result')).toHaveCount(2);
+ await page.locator('[data-employee="2"]').click();
+ await expect(page.locator('.card-to')).toContainText('이준호');
+ await page.locator('#praise-message').fill('동료의 이야기에 귀 기울여 주셔서 정말 감사해요. 함께 일할 수 있어서 든든해요!');
+ await page.locator('[data-category="thanks"]').click();
+ await page.locator('[data-design="best"]').click();
+ await expect(page.locator('.praise-preview')).toHaveClass(/cream/);
+ await expect(page.locator('.card-message')).toContainText('귀 기울여');
+ await page.locator('#send-praise').click();
+ await page.locator('#confirm-send').click();
+ await expect(page.getByRole('dialog')).toContainText('마음이 잘 전해졌어요');
+ await page.locator('#view-sent').click();
+ await expect(page.locator('.history-card')).toHaveCount(2);
+ await page.reload();
+ await expect(page.locator('.history-card')).toHaveCount(3); // received tab on reload
+ await page.locator('[data-my-tab="sent"]').click();
+ await expect(page.locator('.history-card')).toHaveCount(2);
+ await page.locator('[data-nav="profile"]').first().click();
+ await page.locator('#profile-search').fill('이준호');
+ await page.locator('[data-profile-person="2"]').click();
+ await expect(page.locator('.temperature-stat strong')).toContainText('33');
+ await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','43.5');
+ await expect(page.locator('.history-card').first()).toContainText('귀 기울여');
+ await page.locator('[data-profile-tab="detail"]').click();
+ await expect(page.locator('dd')).toContainText(['이준호','삼성카드 / 디지털서비스팀','프로','junho.lee@samsung.com','더 편리한 금융 서비스를 고민합니다.']);
+ await page.locator('[data-profile-tab="schedule"]').click();
+ await expect(page.locator('.schedule-view')).toContainText('공유된 일정이 없어요');
+ await page.locator('[data-nav="my"]').first().click();
+ await page.locator('[data-my-tab="jelly"]').click();
+ await expect(page.locator('.jelly-row.total')).toContainText('240');
+ expect(errors).toEqual([]);
+});
+test('mobile layout and independent name search',async({page})=>{
+ await page.setViewportSize({width:390,height:844});await page.goto('/');
+ await page.locator('#name-search').fill('정다은');
+ await expect(page.locator('.employee-result')).toHaveCount(1);
+ await page.locator('[data-employee="4"]').click();
+ await page.locator('[data-design="together"]').click();
+ await expect(page.locator('.card-to')).toContainText('정다은');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.screenshot({path:'/tmp/maeum-mobile.png',fullPage:true});
+});
+test('desktop screenshot',async({page})=>{
+ await page.setViewportSize({width:1440,height:1080});await page.goto('/');await page.evaluate(()=>document.fonts.ready);
+ await page.screenshot({path:'/tmp/maeum-desktop.png',fullPage:true});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+test('incoming praise updates personal jelly balance and temperature',async({page})=>{
+ await page.goto('/');
+ await page.evaluate(()=>{const existing=JSON.parse(localStorage.getItem('maeum-praises')||'[]');localStorage.setItem('maeum-praises',JSON.stringify([{id:'incoming-demo',to:1,from:2,category:'thanks',design:'thanks',message:'프로젝트를 꼼꼼히 챙겨주셔서 정말 감사합니다.',date:new Date().toISOString()},...existing]));});
+ await page.goto('/#my');await page.reload();
+ await expect(page.locator('.jelly-stat>strong')).toContainText('250');
+ await expect(page.locator('.summary-stat').nth(0)).toContainText('25');
+ await expect(page.locator('.summary-stat').nth(1)).toContainText('42.8');
+ await page.locator('[data-my-tab="jelly"]').click();
+ await expect(page.locator('.jelly-row.total')).toContainText('250');
+ await page.locator('[data-nav="profile"]').first().click();
+ await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','42.8');
+ await page.screenshot({path:'/tmp/maeum-profile.png',fullPage:true});
+});
