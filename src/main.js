@@ -2,7 +2,7 @@ import pinkJelly from './assets/pink-jelly.png';
 import monimoMoLogo from './assets/monimo-mo.png';
 import '@fontsource-variable/noto-sans-kr';
 import './style.css';
-import {employees,categories,designs,seedPraises,searchEmployees,validatePraise} from './data.js';
+import {employees,archivedEmployees,categories,designs,seedPraises,searchEmployees,validatePraise} from './data.js';
 const icons={plus:'<path d="M12 5v14M5 12h14"/>',heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>',grid:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8H7.5A2.5 2.5 0 1 1 10 5.5L12 8Zm0 0h4.5A2.5 2.5 0 1 0 14 5.5L12 8Z"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',arrow:'<path d="M5 12h14m-6-6 6 6-6 6"/>',chevron:'<path d="m9 5 7 7-7 7"/>',check:'<path d="m5 12 4 4L19 6"/>',bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4m0 3h.01"/>',mail:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 6 9 7 9-7"/>',close:'<path d="m6 6 12 12M6 18 18 6"/>',logout:'<path d="M9 3H4v18h5m5-14 5 5-5 5M9 12h12"/>',spark:'<path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5L12 2Z"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/>',send:'<path d="m22 2-7 20-4-9-9-4L22 2ZM22 2 11 13"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/>'};
 const icon=(name,cls='')=>`<svg class="icon ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]||icons.heart}</svg>`;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -35,7 +35,7 @@ praises=praises.map(p=>{const seed=seedPraises.find(s=>s.id===p.id);return seed&
 let view=['send','my','profile'].includes(location.hash.slice(1))?location.hash.slice(1):'send';
 let selected=null,design='thanks',category='together',message='',dept='',name='',profileId=1,profileTab='praise',myTab='received',filter='all';
 let toastTimer;
-const person=id=>employees.find(e=>e.id===Number(id))||employees[0];
+const person=id=>employees.find(e=>e.id===Number(id))||archivedEmployees.find(e=>e.id===Number(id))||employees[0];
 const avatar=(e,size='')=>`<span class="avatar ${e.color} ${size}">${e.initial}</span>`;
 const tag=id=>{let c=categories.find(x=>x.id===id);return `<span class="tag ${id}">${c.emoji} ${c.label}</span>`;};
 const count=id=>praises.filter(p=>p.to===id).length;

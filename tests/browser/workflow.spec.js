@@ -6,10 +6,10 @@ test('search, live preview, send, persist, and profile reward update',async({pag
  await page.goto('/');
  await page.locator('#send-praise').click();
  await expect(page.getByRole('status')).toContainText('동료를 선택');
- await page.locator('#dept-search').fill('디지털서비스팀');
- await expect(page.locator('.employee-result')).toHaveCount(2);
- await page.locator('[data-employee="2"]').click();
- await expect(page.locator('.card-to')).toContainText('이준호');
+ await page.locator('#dept-search').fill('회원유치지원팀');
+ await expect(page.locator('.employee-result')).toHaveCount(1);
+ await page.locator('[data-employee="8"]').click();
+ await expect(page.locator('.card-to')).toContainText('김가연');
  await page.locator('#praise-message').fill('동료의 이야기에 귀 기울여 주셔서 정말 감사해요. 함께 일할 수 있어서 든든해요!');
  await page.locator('[data-category="thanks"]').click();
  await page.locator('[data-design="best"]').click();
@@ -25,13 +25,13 @@ test('search, live preview, send, persist, and profile reward update',async({pag
  await page.locator('[data-my-tab="sent"]').click();
  await expect(page.locator('.history-card')).toHaveCount(2);
  await page.locator('[data-nav="profile"]').first().click();
- await page.locator('#profile-search').fill('이준호');
- await page.locator('[data-profile-person="2"]').click();
- await expect(page.locator('.temperature-stat strong')).toContainText('2');
- await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','37.1');
+ await page.locator('#profile-search').fill('김가연');
+ await page.locator('[data-profile-person="8"]').click();
+ await expect(page.locator('.temperature-stat strong')).toContainText('1');
+ await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','36.8');
  await expect(page.locator('.history-card').first()).toContainText('귀 기울여');
  await page.locator('[data-profile-tab="detail"]').click();
- await expect(page.locator('dd')).toContainText(['이준호','삼성카드 / 디지털서비스팀','프로','junho.lee@example.com','더 편리한 금융 서비스를 고민합니다.']);
+ await expect(page.locator('dd')).toContainText(['김가연','삼성카드 / 회원유치지원팀','프로','employee8@example.com','함께 일하는 동료의 마음을 응원합니다.']);
  await page.locator('[data-profile-tab="schedule"]').click();
  await expect(page.locator('.schedule-view')).toContainText('공유된 일정이 없어요');
  await page.locator('[data-nav="my"]').first().click();
@@ -41,11 +41,11 @@ test('search, live preview, send, persist, and profile reward update',async({pag
 });
 test('mobile layout and independent name search',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/');
- await page.locator('#name-search').fill('정다은');
+ await page.locator('#name-search').fill('정다운');
  await expect(page.locator('.employee-result')).toHaveCount(1);
- await page.locator('[data-employee="4"]').click();
+ await page.locator('[data-employee="16"]').click();
  await page.locator('[data-design="together"]').click();
- await expect(page.locator('.card-to')).toContainText('정다은');
+ await expect(page.locator('.card-to')).toContainText('정다운');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.screenshot({path:'/tmp/maeum-mobile.png',fullPage:true});
 });
@@ -127,7 +127,7 @@ test('mobile fixed navigation and composer actions support the complete send flo
 });
 test('alphabetical employee dropdown includes requested directory and awards one special jelly',async({page})=>{
  const expected=[['강기병','ax추진팀'],['김가연','회원유치지원팀'],['김희준','데이터솔루션팀'],['박세연','LifeCare마케팅팀'],['박찬영','IT기획팀'],['이채원','프리미엄마케팅팀'],['장호준','로열티마케팅팀'],['최민경','모니모서비스팀'],['진현준','정보보호팀'],['이유진','회원신용전략팀'],['정다운','금융마케팅팀'],['신성은','디지털사업팀']];
- const options=page.locator('#employee-select option');await expect(options.first()).toHaveText('전체');
+ const options=page.locator('#employee-select option');await expect(options.first()).toHaveText('전체');await expect(options).toHaveCount(13);
  const names=(await options.allTextContents()).slice(1).map(t=>t.split(' · ')[0]);expect(names).toEqual([...names].sort((a,b)=>a.localeCompare(b,'ko')));
  for(const [name,department] of expected)await expect(options.filter({hasText:name+' · '+department})).toHaveCount(1);
  await expect(page.locator('#employee-select option[value="1"]')).toHaveJSProperty('disabled',true);

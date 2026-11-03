@@ -33,7 +33,7 @@ test('all profile counts match histories and jelly ledger has no hidden balance'
  await page.locator('[data-filter="thanks"]').click();await expect(page.locator('.list-heading h2')).toContainText('1');await expect(page.locator('.history-card')).toHaveCount(1);
  await page.locator('[data-my-tab="jelly"]').click();await expect(page.locator('.jelly-row-title')).toHaveCount(3);await expect(page.locator('.jelly-row.total')).toContainText('3개');await expect(page.locator('.jelly-row.balance')).toHaveCount(0);
  await page.locator('[data-nav="profile"]').first().click();
- for(const [name,total] of [['김희준',3],['이준호',1],['박서연',1],['정다은',0],['최현우',0],['김지수',0]]){
+ for(const [name,total] of [['김희준',3],['김가연',0],['박세연',0],['정다운',0],['장호준',0],['신성은',0]]){
   await page.locator('#profile-search').fill(name);await page.locator('[data-profile-person]').click();
   await expect(page.locator('.temperature-stat strong')).toHaveText(total+'번');await expect(page.locator('.history-card')).toHaveCount(total);
   await expect(page.locator('[data-profile-tab="praise"] span')).toHaveText(String(total));
