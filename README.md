@@ -35,7 +35,7 @@ npm run dev -- --port 5173
 ```sh
 npm test
 npm run build
-# 개발 서버를 실행한 상태에서
+# 테스트가 필요한 개발 서버를 자동으로 시작합니다.
 npm run test:e2e
 ```
 
@@ -63,3 +63,15 @@ npm run test:e2e
 Vite의 상대 경로 설정으로 GitHub Pages의 `/monimo/` 하위 경로에서도 CSS·JavaScript·폰트가 로드됩니다. 각 방문자의 칭찬은 해당 브라우저에만 저장되므로 다른 방문자와 데이터를 공유하지 않습니다.
 
 Vercel을 사용하는 경우 GitHub 저장소를 Import하고 Framework Preset **Vite**, Build Command **npm run build**, Output Directory **dist**로 배포할 수도 있습니다. 별도의 비밀키나 환경 변수는 필요하지 않습니다.
+
+## 모바일 사용 및 QR 공유
+
+휴대폰에서는 화면 하단의 메뉴로 칭찬 보내기·마이페이지·임직원 프로필을 이동합니다. 칭찬 작성 화면에는 단계별 바로가기와 고정된 미리보기·전송 버튼이 있으며, 입력창에 포커스가 있는 동안 하단 메뉴와 전송 버튼을 숨겨 키보드 입력 공간을 확보합니다. 입력 글자 크기는 모바일에서 16px로 설정했습니다.
+
+QR코드는 로그인 첫 화면 `https://heestogram.github.io/monimo/`로 연결됩니다.
+
+- 화면 공유용 PNG: `public/share/maeum-moa-qr.png` (540 × 540px)
+- 확대·인쇄용 SVG: `public/share/maeum-moa-qr.svg`
+- 배포 후 다운로드 경로: `https://heestogram.github.io/monimo/share/maeum-moa-qr.png`
+
+시연 계정은 ID `c123456`, PW `demo1234`입니다. QR코드에는 접속 주소만 들어 있으며 로그인 정보는 포함하지 않습니다.

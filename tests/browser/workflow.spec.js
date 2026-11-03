@@ -96,3 +96,32 @@ test('praise banner handles empty history and a single saved praise without chan
  await expect(page.locator('.stream-card:not([aria-hidden])')).toHaveCount(1);
  await page.locator('[data-nav="my"]').first().click();await expect(page.locator('.summary-stat').first().locator('strong')).toHaveText('1개');await expect(page.locator('.history-card')).toHaveCount(1);
 });
+test('mobile fixed navigation and composer actions support the complete send flow',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/#send');
+ await expect(page.locator('.sidebar nav')).toHaveCSS('position','fixed');
+ await expect(page.locator('.mobile-compose-actions')).toBeVisible();
+ await page.locator('[data-compose-jump="1"]').click();
+ await page.locator('#name-search').fill('강기뱅');
+ await expect(page.locator('.mobile-compose-actions')).toBeHidden();
+ await page.locator('[data-employee="7"]').click();
+ await page.locator('[data-compose-jump="2"]').click();
+ await page.locator('#praise-message').fill('함께 고민하고 도와주셔서 감사합니다. 모바일에서도 따뜻한 마음을 전해요!');
+ await expect(page.locator('.sidebar nav')).toBeHidden();
+ await page.locator('[data-category="thanks"]').click();
+ await page.locator('[data-compose-jump="3"]').click();
+ await page.locator('[data-design="cheer"]').click();
+ await page.locator('#mobile-preview').click();
+ await expect(page.locator('.card-to')).toContainText('강기뱅');
+ await page.locator('#mobile-send').click();
+ await page.locator('#confirm-send').click();
+ await page.locator('#view-sent').click();
+ await expect(page.locator('.history-card').first()).toContainText('모바일에서도');
+ await expect(page.locator('.mobile-compose-actions')).toHaveCount(0);
+ await page.locator('.sidebar [data-nav="profile"]').click();
+ await expect(page.locator('#profile-search')).toBeVisible();
+ for(const width of [360,390,430]){
+  await page.setViewportSize({width,height:844});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ }
+});
