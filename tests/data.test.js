@@ -6,7 +6,7 @@ test('department-only search and name-only search independently return employees
  assert.equal(searchEmployees('','이준호')[0].id,2);
  assert.equal(searchEmployees('디지털서비스팀','김')[0].name,'김지수');
  assert.equal(searchEmployees('인재운영팀','이준호').length,0);
- assert.equal(searchEmployees('','김히준',1).length,0);
+ assert.equal(searchEmployees('','김희준',1).length,0);
 });
 test('prevent sending without recipient or meaningful message',()=>{
  assert.ok(validatePraise(null,'좋은 동료가 되어주셔서 감사합니다.','together','thanks'));

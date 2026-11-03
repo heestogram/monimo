@@ -36,7 +36,7 @@ test('search, live preview, send, persist, and profile reward update',async({pag
  await expect(page.locator('.schedule-view')).toContainText('공유된 일정이 없어요');
  await page.locator('[data-nav="my"]').first().click();
  await page.locator('[data-my-tab="jelly"]').click();
- await expect(page.locator('.jelly-row.total')).toContainText('30');
+ await expect(page.locator('.jelly-row.total')).toContainText('3개');
  expect(errors).toEqual([]);
 });
 test('mobile layout and independent name search',async({page})=>{
@@ -58,11 +58,11 @@ test('incoming praise updates personal jelly balance and temperature',async({pag
  await page.goto('/');
  await page.evaluate(seed=>{const existing=JSON.parse(localStorage.getItem('maeum-praises')||'null')||seed;localStorage.setItem('maeum-praises',JSON.stringify([{id:'incoming-demo',to:1,from:2,category:'thanks',design:'thanks',message:'프로젝트를 꼼꼼히 챙겨주셔서 정말 감사합니다.',date:new Date().toISOString()},...existing]));},seedPraises);
  await page.goto('/#my');await page.reload();
- await expect(page.locator('.jelly-stat>strong')).toContainText('40');
- await expect(page.locator('.summary-stat').nth(0)).toContainText('4');
- await expect(page.locator('.summary-stat').nth(1)).toContainText('37.7');
+ await expect(page.locator('.jelly-stat')).toHaveCount(0);
+ await expect(page.locator('[data-my-tab="received"] span')).toHaveText('4');
+ await expect(page.locator('.summary-stat')).toHaveCount(0);
  await page.locator('[data-my-tab="jelly"]').click();
- await expect(page.locator('.jelly-row.total')).toContainText('40');
+ await expect(page.locator('.jelly-row.total')).toContainText('4개');
  await page.locator('[data-nav="profile"]').first().click();
  await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','37.7');
  await page.screenshot({path:'/tmp/maeum-profile.png',fullPage:true});
@@ -94,7 +94,7 @@ test('praise banner handles empty history and a single saved praise without chan
  await expect(page.locator('.praise-stream')).toHaveCount(0);await expect(page.locator('#send-praise')).toBeVisible();
  await page.evaluate(p=>localStorage.setItem('maeum-praises',JSON.stringify([p])),seedPraises[0]);await page.reload();
  await expect(page.locator('.stream-card:not([aria-hidden])')).toHaveCount(1);
- await page.locator('[data-nav="my"]').first().click();await expect(page.locator('.summary-stat').first().locator('strong')).toHaveText('1개');await expect(page.locator('.history-card')).toHaveCount(1);
+ await page.locator('[data-nav="my"]').first().click();await expect(page.locator('[data-my-tab="received"] span')).toHaveText('1');await expect(page.locator('.history-card')).toHaveCount(1);
 });
 test('mobile fixed navigation and composer actions support the complete send flow',async({page})=>{
  await page.setViewportSize({width:390,height:844});
@@ -102,7 +102,7 @@ test('mobile fixed navigation and composer actions support the complete send flo
  await expect(page.locator('.sidebar nav')).toHaveCSS('position','fixed');
  await expect(page.locator('.mobile-compose-actions')).toBeVisible();
  await page.locator('[data-compose-jump="1"]').click();
- await page.locator('#name-search').fill('강기뱅');
+ await page.locator('#name-search').fill('강기병');
  await expect(page.locator('.mobile-compose-actions')).toBeHidden();
  await page.locator('[data-employee="7"]').click();
  await page.locator('[data-compose-jump="2"]').click();
@@ -112,7 +112,7 @@ test('mobile fixed navigation and composer actions support the complete send flo
  await page.locator('[data-compose-jump="3"]').click();
  await page.locator('[data-design="cheer"]').click();
  await page.locator('#mobile-preview').click();
- await expect(page.locator('.card-to')).toContainText('강기뱅');
+ await expect(page.locator('.card-to')).toContainText('강기병');
  await page.locator('#mobile-send').click();
  await page.locator('#confirm-send').click();
  await page.locator('#view-sent').click();
@@ -122,6 +122,26 @@ test('mobile fixed navigation and composer actions support the complete send flo
  await expect(page.locator('#profile-search')).toBeVisible();
  for(const width of [360,390,430]){
   await page.setViewportSize({width,height:844});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ }
+});
+test('alphabetical employee dropdown includes requested directory and awards one special jelly',async({page})=>{
+ const expected=[['강기병','ax추진팀'],['김가연','회원유치지원팀'],['김희준','데이터솔루션팀'],['박세연','LifeCare마케팅팀'],['박찬영','IT기획팀'],['이채원','프리미엄마케팅팀'],['장호준','로열티마케팅팀'],['최민경','모니모서비스팀'],['진현준','정보보호팀'],['이유진','회원신용전략팀'],['정다운','금융마케팅팀'],['신성은','디지털사업팀']];
+ const options=page.locator('#employee-select option');await expect(options.first()).toHaveText('전체');
+ const names=(await options.allTextContents()).slice(1).map(t=>t.split(' · ')[0]);expect(names).toEqual([...names].sort((a,b)=>a.localeCompare(b,'ko')));
+ for(const [name,department] of expected)await expect(options.filter({hasText:name+' · '+department})).toHaveCount(1);
+ await expect(page.locator('#employee-select option[value="1"]')).toHaveJSProperty('disabled',true);
+ await page.locator('#employee-select').selectOption('8');await expect(page.locator('.selected-person')).toContainText('김가연');await expect(page.locator('.card-to')).toContainText('김가연');
+ await page.locator('#remove-person').click();await expect(page.locator('#employee-select')).toHaveValue('');
+ await page.locator('#name-search').fill('최민경');await page.locator('[data-employee="13"]').click();await expect(page.locator('#employee-select')).toHaveValue('13');
+ await expect(page.locator('.reward-notice')).toContainText('받는 동료에게 스페셜 젤리 1개 선물!');
+ await page.locator('#praise-message').fill('함께 협력해주셔서 정말 감사합니다. 새로운 직원 목록에서도 마음을 전해요.');
+ await page.locator('#send-praise').click();await expect(page.getByRole('dialog')).toContainText('스페셜 젤리 1개');await page.locator('#confirm-send').click();await expect(page.locator('.success-reward')).toContainText('+1');
+ await page.locator('#view-sent').click();await expect(page.locator('.summary-stat')).toHaveCount(0);await expect(page.locator('.my-welcome')).toContainText('김희준');
+ await page.locator('[data-nav="send"]').first().click();
+ for(const width of [360,390,1024,1440]){
+  await page.setViewportSize({width,height:900});
+  const tops=await page.locator('.category-option').evaluateAll(es=>es.map(e=>Math.round(e.getBoundingClientRect().top)));expect(new Set(tops).size).toBe(1);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  }
 });
