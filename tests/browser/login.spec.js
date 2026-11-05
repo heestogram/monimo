@@ -1,13 +1,15 @@
+import {nextStep} from './helpers.js';
 import {test,expect} from '@playwright/test';
 async function login(page,id,pw='any-demo-password') {
+ await expect(page.locator('.login-page')).toHaveJSProperty('inert',false);
  await page.locator('#login-id').fill(id);await page.locator('#login-pw').fill(pw);
  await page.getByRole('button',{name:'로그인',exact:true}).click();
- await expect(page.locator('#send-praise')).toBeVisible();
+ await expect(page.locator('#wizard-next')).toBeVisible();
  return page.locator('.current-user strong').innerText();
 }
 async function send(page,recipient,text) {
- await page.locator('#employee-select').selectOption(String(recipient));
- await page.locator('#praise-message').fill(text);
+ await page.locator('#employee-select').selectOption(String(recipient));await nextStep(page,2);
+ await page.locator('#praise-message').fill(text);await nextStep(page,3);await nextStep(page,4);
  await page.locator('#send-praise').click();await page.locator('#confirm-send').click();await page.locator('#view-sent').click();
 }
 test('arbitrary credentials, stable identity, isolated histories and restricted recipients survive a new session',async({page,context})=>{
@@ -62,7 +64,7 @@ test('legacy praises reset once while new cards persist',async({page})=>{
  await expect(page.locator('.temperature-stat strong')).toHaveText('1번');await expect(page.locator('.history-card')).toHaveCount(1);
 });
 test('landing fades in, respects reduced motion and fits mobile',async({page})=>{
- await page.goto('/');await expect(page.locator('.login-story-copy h1')).toHaveCSS('animation-name','login-reveal');
+ await page.goto('/');await expect(page.locator('.brand-intro')).toHaveCount(0);await expect(page.locator('.login-story-copy h1')).toHaveCSS('animation-name','login-reveal');
  await expect(page.locator('.login-art')).toHaveCSS('animation-name','login-reveal');
  await expect(page.locator('.login-art')).toHaveCSS('opacity','1');
  await page.setViewportSize({width:1440,height:1000});await page.screenshot({path:'/tmp/maeum-login-desktop.png',fullPage:true});
@@ -72,7 +74,7 @@ test('landing fades in, respects reduced motion and fits mobile',async({page})=>
  await login(page,'mobile-user');const image=page.locator('.reward-notice img');expect(await image.evaluate(img=>img.complete&&img.naturalWidth>0)).toBe(true);
 });
 test('storage failure does not promise a saved account',async({page})=>{
- await page.goto('/');await page.evaluate(()=>{Storage.prototype.setItem=()=>{throw new Error('blocked');};});
+ await page.goto('/');await expect(page.locator('.login-page')).toHaveJSProperty('inert',false);await page.evaluate(()=>{Storage.prototype.setItem=()=>{throw new Error('blocked');};});
  await page.locator('#login-id').fill('blocked-user');await page.locator('#login-pw').fill('anything');await page.getByRole('button',{name:'로그인',exact:true}).click();
  await expect(page.getByRole('alert')).toContainText('저장하지 못했어요');await expect(page.locator('#login-form')).toBeVisible();
 });

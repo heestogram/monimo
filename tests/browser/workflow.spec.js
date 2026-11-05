@@ -1,20 +1,22 @@
+import {nextStep} from './helpers.js';
 import { test, expect } from '@playwright/test';
 const seedPraises = Array.from({length:4},(_,i)=>({id:'s'+(i+1),to:0,from:8,category:'thanks',design:'thanks',message:'서로의 이야기를 들어주셔서 정말 감사합니다. 함께해서 든든합니다.',date:new Date().toISOString()}));
-test.beforeEach(async({page})=>{await page.goto('/');await page.locator('#login-id').fill('c123456');await page.locator('#login-pw').fill('demo1234');await page.getByRole('button',{name:'로그인',exact:true}).click();});
+test.beforeEach(async({page})=>{await page.goto('/');await expect(page.locator('.login-page')).toHaveJSProperty('inert',false);await page.locator('#login-id').fill('c123456');await page.locator('#login-pw').fill('demo1234');await page.getByRole('button',{name:'로그인',exact:true}).click();await expect(page.locator('#praise-wizard')).toBeVisible();});
 test('search, live preview, send, persist, and profile reward update',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('/');
- await page.locator('#send-praise').click();
- await expect(page.getByRole('status')).toContainText('동료를 선택');
+ await page.locator('#wizard-next').click();
+ await expect(page.locator('#wizard-error')).toContainText('동료를 선택');
  await page.locator('#dept-search').fill('회원유치지원팀');
  await expect(page.locator('.employee-result')).toHaveCount(1);
  await page.locator('[data-employee="8"]').click();
  await expect(page.locator('.card-to')).toContainText('김가연');
+ await nextStep(page,2);
  await page.locator('#praise-message').fill('동료의 이야기에 귀 기울여 주셔서 정말 감사해요. 함께 일할 수 있어서 든든해요!');
- await page.locator('[data-category="thanks"]').click();
+ await page.locator('[data-category="thanks"]').click();await nextStep(page,3);
  await page.locator('[data-design="best"]').click();
  await expect(page.locator('.praise-preview')).toHaveClass(/cream/);
- await expect(page.locator('.card-message')).toContainText('귀 기울여');
+ await expect(page.locator('.card-message')).toContainText('귀 기울여');await nextStep(page,4);
  await page.locator('#send-praise').click();
  await page.locator('#confirm-send').click();
  await expect(page.getByRole('dialog')).toContainText('마음이 잘 전해졌어요');
@@ -43,7 +45,7 @@ test('mobile layout and independent name search',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/');
  await page.locator('#name-search').fill('정다운');
  await expect(page.locator('.employee-result')).toHaveCount(1);
- await page.locator('[data-employee="16"]').click();
+ await page.locator('[data-employee="16"]').click();await nextStep(page,2);await page.locator('#praise-message').fill('동료에게 따뜻한 응원의 마음을 전합니다.');await nextStep(page,3);
  await page.locator('[data-design="together"]').click();
  await expect(page.locator('.card-to')).toContainText('정다운');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -92,7 +94,7 @@ test('praise highlights slide left, pause, open detail, and respect reduced moti
 });
 test('praise banner handles empty history and a single saved praise without changing totals',async({page})=>{
  await page.evaluate(()=>localStorage.setItem('maeum-praises-v2','[]'));await page.reload();
- await expect(page.locator('.praise-stream')).toHaveCount(0);await expect(page.locator('#send-praise')).toBeVisible();
+ await expect(page.locator('.praise-stream')).toHaveCount(0);await expect(page.locator('#wizard-next')).toBeVisible();
  await page.evaluate(p=>localStorage.setItem('maeum-praises-v2',JSON.stringify([{...p,to:Number(sessionStorage.getItem('maeum-session-v2'))}])),seedPraises[0]);await page.reload();
  await expect(page.locator('.stream-card:not([aria-hidden])')).toHaveCount(1);
  await page.locator('[data-nav="my"]').first().click();await expect(page.locator('[data-my-tab="received"] span')).toHaveText('1');await expect(page.locator('.history-card')).toHaveCount(1);
@@ -101,20 +103,19 @@ test('mobile fixed navigation and composer actions support the complete send flo
  await page.setViewportSize({width:390,height:844});
  await page.goto('/#send');
  await expect(page.locator('.sidebar nav')).toHaveCSS('position','fixed');
- await expect(page.locator('.mobile-compose-actions')).toBeVisible();
- await page.locator('[data-compose-jump="1"]').click();
+ await expect(page.locator('#wizard-next')).toBeVisible();
  await page.locator('#name-search').fill('강기병');
- await expect(page.locator('.mobile-compose-actions')).toBeHidden();
+ await expect(page.locator('[data-step-panel="2"]')).toBeHidden();
  await page.locator('[data-employee="7"]').click();
- await page.locator('[data-compose-jump="2"]').click();
+ await nextStep(page,2);
  await page.locator('#praise-message').fill('함께 고민하고 도와주셔서 감사합니다. 모바일에서도 따뜻한 마음을 전해요!');
  await expect(page.locator('.sidebar nav')).toBeHidden();
  await page.locator('[data-category="thanks"]').click();
- await page.locator('[data-compose-jump="3"]').click();
+ await nextStep(page,3);
  await page.locator('[data-design="cheer"]').click();
- await page.locator('#mobile-preview').click();
+ await nextStep(page,4);
  await expect(page.locator('.card-to')).toContainText('강기병');
- await page.locator('#mobile-send').click();
+ await page.locator('#send-praise').click();
  await page.locator('#confirm-send').click();
  await page.locator('#view-sent').click();
  await expect(page.locator('.history-card').first()).toContainText('모바일에서도');
@@ -135,11 +136,11 @@ test('alphabetical employee dropdown includes requested directory and awards one
  await page.locator('#employee-select').selectOption('8');await expect(page.locator('.selected-person')).toContainText('김가연');await expect(page.locator('.card-to')).toContainText('김가연');
  await page.locator('#remove-person').click();await expect(page.locator('#employee-select')).toHaveValue('');
  await page.locator('#name-search').fill('최민경');await page.locator('[data-employee="13"]').click();await expect(page.locator('#employee-select')).toHaveValue('13');
- await expect(page.locator('.reward-notice')).toContainText('받는 동료에게 스페셜 젤리 1개 선물!');
- await page.locator('#praise-message').fill('함께 협력해주셔서 정말 감사합니다. 새로운 직원 목록에서도 마음을 전해요.');
+ await expect(page.locator('.reward-notice')).toContainText('받는 동료에게 스페셜 젤리 1개 선물!');await nextStep(page,2);
+ await page.locator('#praise-message').fill('함께 협력해주셔서 정말 감사합니다. 새로운 직원 목록에서도 마음을 전해요.');await nextStep(page,3);await nextStep(page,4);
  await page.locator('#send-praise').click();await expect(page.getByRole('dialog')).toContainText('스페셜 젤리 1개');await page.locator('#confirm-send').click();await expect(page.locator('.success-reward')).toContainText('+1');
  await page.locator('#view-sent').click();await expect(page.locator('.summary-stat')).toHaveCount(0);await expect(page.locator('.my-welcome')).toContainText('삼성카드 아이디어톤팀');
- await page.locator('[data-nav="send"]').first().click();
+ await page.locator('[data-nav="send"]').first().click();await page.locator('#employee-select').selectOption('8');await nextStep(page,2);
  for(const width of [360,390,1024,1440]){
   await page.setViewportSize({width,height:900});
   const tops=await page.locator('.category-option').evaluateAll(es=>es.map(e=>Math.round(e.getBoundingClientRect().top)));expect(new Set(tops).size).toBe(1);
