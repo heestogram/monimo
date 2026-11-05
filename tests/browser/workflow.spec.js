@@ -128,10 +128,10 @@ test('mobile fixed navigation and composer actions support the complete send flo
 });
 test('alphabetical employee dropdown includes requested directory and awards one special jelly',async({page})=>{
  const expected=[['강기병','ax추진팀'],['김가연','회원유치지원팀'],['김희준','데이터솔루션팀'],['박세연','LifeCare마케팅팀'],['박찬영','IT기획팀'],['이채원','프리미엄마케팅팀'],['장호준','로열티마케팅팀'],['최민경','모니모서비스팀'],['진현준','정보보호팀'],['이유진','회원신용전략팀'],['정다운','금융마케팅팀'],['신성은','디지털사업팀']];
- const options=page.locator('#employee-select option');await expect(options.first()).toHaveText('전체');await expect(options).toHaveCount(14);
+ const options=page.locator('#employee-select option');await expect(options.first()).toHaveText('전체');await expect(options).toHaveCount(13);
  const names=(await options.allTextContents()).slice(1).map(t=>t.split(' · ')[0]);expect(names).toEqual([...names].sort((a,b)=>a.localeCompare(b,'ko')));
  for(const [name,department] of expected)await expect(options.filter({hasText:name+' · '+department})).toHaveCount(1);
- await expect(page.locator('#employee-select option:disabled')).toContainText('(본인)');await expect(page.locator('#employee-select option[value="1"]')).toHaveJSProperty('disabled',false);
+ await expect(page.locator('#employee-select option:disabled')).toHaveCount(0);await expect(page.locator('#employee-select option[value="1"]')).toHaveJSProperty('disabled',false);
  await page.locator('#employee-select').selectOption('8');await expect(page.locator('.selected-person')).toContainText('김가연');await expect(page.locator('.card-to')).toContainText('김가연');
  await page.locator('#remove-person').click();await expect(page.locator('#employee-select')).toHaveValue('');
  await page.locator('#name-search').fill('최민경');await page.locator('[data-employee="13"]').click();await expect(page.locator('#employee-select')).toHaveValue('13');

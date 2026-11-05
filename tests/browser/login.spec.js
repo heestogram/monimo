@@ -10,7 +10,7 @@ async function send(page,recipient,text) {
  await page.locator('#praise-message').fill(text);
  await page.locator('#send-praise').click();await page.locator('#confirm-send').click();await page.locator('#view-sent').click();
 }
-test('arbitrary credentials, stable identity, isolated histories and received rewards survive a new session',async({page,context})=>{
+test('arbitrary credentials, stable identity, isolated histories and restricted recipients survive a new session',async({page,context})=>{
  await page.goto('/#profile');await expect(page.locator('#login-form')).toBeVisible();
  await page.getByRole('button',{name:'로그인',exact:true}).click();await expect(page.getByRole('alert')).toContainText('모두 입력');
  const nameA=await login(page,'c987654','first-password');
@@ -25,15 +25,23 @@ test('arbitrary credentials, stable identity, isolated histories and received re
  await page.locator('[data-nav="my"]').first().click();await page.locator('[data-my-tab="sent"]').click();
  await expect(page.locator('.history-card')).toHaveCount(0);
  await page.locator('[data-nav="send"]').first().click();
- await send(page,idA,'첫 번째 가상 동료에게 응원의 마음을 전합니다.');
+ await expect(page.locator('#employee-select option')).toHaveCount(13);
+ await expect(page.locator(`#employee-select option[value="${idA}"]`)).toHaveCount(0);
+ await page.locator('#name-search').fill(nameA);await expect(page.locator('.employee-result')).toHaveCount(0);
+ await page.locator('#name-search').fill('');await page.locator('#dept-search').fill('삼성카드 아이디어톤팀');await expect(page.locator('.employee-result')).toHaveCount(0);
+ await page.locator('[data-nav="profile"]').first().click();await page.locator('#profile-search').fill(nameA);await expect(page.locator('[data-profile-person]')).toHaveCount(0);
+ await page.locator('[data-nav="send"]').first().click();
+ // Even an injected dropdown option cannot select a virtual account.
+ await page.evaluate(id=>{const select=document.getElementById('employee-select');select.add(new Option('가상 계정',id));select.value=id;select.dispatchEvent(new Event('change'));},idA);
+ await expect(page.locator('.selected-person')).toHaveCount(0);
+ await send(page,7,'두 번째 계정에서 강기병 프로에게 응원을 전합니다.');
  await page.locator('#logout').click();
  await login(page,' C987654 ','entirely-different-password');
  await expect(page.locator('.current-user strong')).toHaveText(nameA);
- await page.locator('[data-nav="my"]').first().click();await expect(page.locator('.history-card')).toHaveCount(1);
- await expect(page.locator('.history-card')).toContainText('응원의 마음');
- await page.locator('[data-my-tab="jelly"]').click();await expect(page.locator('.jelly-row.total')).toContainText('1개');
- await page.locator('#my-profile').click();await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','36.8');
- await expect(page.locator('.temperature-stat strong')).toHaveText('1번');
+ await page.locator('[data-nav="my"]').first().click();await expect(page.locator('.history-card')).toHaveCount(0);
+ await page.locator('[data-my-tab="jelly"]').click();await expect(page.locator('.jelly-row.total')).toContainText('0개');
+ await page.locator('#my-profile').click();await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','36.5');
+ await expect(page.locator('.temperature-stat strong')).toHaveText('0번');
  await page.locator('[data-nav="my"]').first().click();await page.locator('[data-my-tab="sent"]').click();
  await expect(page.locator('.history-card')).toHaveCount(1);await expect(page.locator('.history-card')).toContainText('첫 번째 계정에서');
  const storage=await page.evaluate(()=>JSON.stringify({...localStorage,...sessionStorage}));
