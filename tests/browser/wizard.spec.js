@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test';
 import {nextStep,previousStep} from './helpers.js';
 test('four pages validate each step and preserve the draft when moving back',async({page})=>{
  await page.emulateMedia({reducedMotion:'reduce'});
- await page.goto('/');await page.locator('#login-id').fill('wizard-user');await page.locator('#login-pw').fill('demo');await page.locator('.login-submit').click();
+ await page.goto('/');await page.locator('#login-id').fill('wizard-user');await page.locator('#login-pw').fill('demo');await page.locator('.login-submit').click();await page.locator('.sidebar [data-nav="send"]').click();
  await expect(page.locator('[data-step-panel]:visible')).toHaveCount(1);
  await expect(page.locator('#send-praise')).toBeHidden();await expect(page.locator('#wizard-back')).toBeHidden();
  await page.locator('#wizard-next').click();await expect(page.locator('#wizard-error')).toContainText('동료');
@@ -24,7 +24,7 @@ test('four pages validate each step and preserve the draft when moving back',asy
 });
 test('wizard fades and mobile pages remain within viewport',async({page})=>{
  await page.emulateMedia({reducedMotion:'reduce'});await page.setViewportSize({width:390,height:844});await page.goto('/');
- await page.locator('#login-id').fill('mobile-wizard');await page.locator('#login-pw').fill('demo');await page.locator('.login-submit').click();
+ await page.locator('#login-id').fill('mobile-wizard');await page.locator('#login-pw').fill('demo');await page.locator('.login-submit').click();await page.locator('.sidebar [data-nav="send"]').click();
  await page.emulateMedia({reducedMotion:'no-preference'});
  await page.locator('#employee-select').selectOption('8');
  await page.locator('#wizard-next').click();await expect(page.locator('#praise-wizard')).toHaveAttribute('aria-busy','true');
@@ -46,7 +46,7 @@ test('intro grows MO on white, moves to the corner, reveals login and does not r
  await page.screenshot({path:'/tmp/maeum-intro-start.png'});
  await expect(page.locator('.brand-intro')).toHaveCount(0,{timeout:6000});
  await expect(page.locator('.login-page')).toHaveJSProperty('inert',false);
- await page.locator('#login-id').fill('intro');await page.locator('#login-pw').fill('demo');await page.locator('.login-submit').click();await page.locator('#logout').click();
+ await page.locator('#login-id').fill('intro');await page.locator('#login-pw').fill('demo');await page.locator('.login-submit').click();await page.locator('.sidebar [data-nav="send"]').click();await page.locator('#logout').click();
  await expect(page.locator('.brand-intro')).toHaveCount(0);await expect(page.locator('#login-id')).toBeEditable();
  await page.emulateMedia({reducedMotion:'reduce'});await page.reload();await expect(page.locator('.brand-intro')).toHaveCount(0);await expect(page.locator('.login-page')).toHaveJSProperty('inert',false);
 });

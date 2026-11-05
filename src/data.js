@@ -14,6 +14,19 @@ export const employees = [
 ];
 export const categories = [{id:'together',label:'최고의 동료',emoji:'🤝',desc:'함께여서 든든해요'},{id:'thanks',label:'따뜻한 배려',emoji:'💙',desc:'작은 배려에 감사해요'},{id:'passion',label:'빛나는 열정',emoji:'✨',desc:'열정에 박수를 보내요'},{id:'idea',label:'멋진 아이디어',emoji:'💡',desc:'새로운 생각을 응원해요'}];
 export const designs = [{id:'thanks',label:'고마워요',title:'덕분에 참 든든해요',subtitle:'작은 배려가 큰 힘이 되었어요',theme:'sky',accessory:'heart'},{id:'best',label:'최고예요',title:'당신이 있어 빛나요',subtitle:'오늘도 멋진 당신에게 박수를!',theme:'cream',accessory:'star'},{id:'cheer',label:'응원해요',title:'언제나 응원할게요',subtitle:'우리 함께라면 해낼 수 있어요',theme:'lilac',accessory:'flag'},{id:'together',label:'함께해요',title:'함께라서 더 좋아요',subtitle:'앞으로도 좋은 동료가 되어주세요',theme:'mint',accessory:'flower'}];
-export const seedPraises = [];
+const sampleMessages = [
+ '복잡한 내용도 쉽게 알려주셔서 감사해요!', '새로운 도전에 함께해주셔서 든든해요!',
+ '항상 밝게 맞아주셔서 감사해요!', '세심한 배려 덕분에 힘이 나요!',
+ '꼼꼼하게 챙겨주셔서 정말 든든해요!', '멋진 아이디어를 나눠주셔서 고마워요!',
+ '동료의 이야기에 귀 기울여주셔서 감사해요!', '함께 해결책을 찾아주셔서 고마워요!',
+ '보이지 않는 곳에서도 애써주셔서 감사해요!', '차분하게 도와주셔서 큰 힘이 됐어요!',
+ '따뜻한 응원 한마디에 힘이 났어요!', '함께할 때마다 좋은 에너지를 받아요!'
+];
+// Explicitly fictional cards for the twelve demo profiles, each with a stable ID.
+export const seedPraises = employees.map((employee,index)=>({
+ id:`welcome-v1-${employee.id}`,to:employee.id,from:employees[(index+1)%employees.length].id,
+ category:categories[index%categories.length].id,design:designs[index%designs.length].id,
+ message:sampleMessages[index],date:'2026-11-05T00:00:00Z',sample:true
+}));
 export function searchEmployees(dept='',name='',exclude=null,directory=employees){return directory.filter(e=>e.id!==exclude && e.department.toLocaleLowerCase().includes(dept.trim().toLocaleLowerCase()) && e.name.includes(name.trim())).sort((a,b)=>a.name.localeCompare(b.name,'ko')); }
 export function validatePraise(to,message,category,design,currentId=null,directory=employees){if(!directory.some(e=>e.id===to&&e.id!==currentId))return '칭찬받을 동료를 선택해주세요.';if(!message.trim())return '동료에게 전할 칭찬 메시지를 적어주세요.';if(message.trim().length<10)return '칭찬 메시지를 10자 이상 작성해주세요.';if(message.length>300)return '칭찬 메시지는 300자까지 작성할 수 있어요.';if(!categories.some(c=>c.id===category)||!designs.some(d=>d.id===design))return '칭찬 유형과 카드를 선택해주세요.';return '';}

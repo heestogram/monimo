@@ -4,7 +4,7 @@ async function login(page,id,pw='any-demo-password') {
  await expect(page.locator('.login-page')).toHaveJSProperty('inert',false);
  await page.locator('#login-id').fill(id);await page.locator('#login-pw').fill(pw);
  await page.getByRole('button',{name:'로그인',exact:true}).click();
- await expect(page.locator('#wizard-next')).toBeVisible();
+ await expect(page.locator('.home-intro')).toBeVisible();await page.locator('.sidebar [data-nav="send"]').click();await expect(page.locator('#wizard-next')).toBeVisible();
  return page.locator('.current-user strong').innerText();
 }
 async function send(page,recipient,text) {
@@ -61,7 +61,7 @@ test('legacy praises reset once while new cards persist',async({page})=>{
  await send(page,1,'초기화 이후에 새롭게 저장한 칭찬은 계속 남아 있어요.');
  await page.reload();await page.locator('[data-my-tab="sent"]').click();await expect(page.locator('.history-card')).toHaveCount(1);
  await page.locator('[data-nav="profile"]').first().click();await page.locator('#profile-search').fill('김희준');await page.locator('[data-profile-person="1"]').click();
- await expect(page.locator('.temperature-stat strong')).toHaveText('1번');await expect(page.locator('.history-card')).toHaveCount(1);
+ await expect(page.locator('.temperature-stat strong')).toHaveText('2번');await expect(page.locator('.history-card')).toHaveCount(2);
 });
 test('landing fades in, respects reduced motion and fits mobile',async({page})=>{
  await page.goto('/');await expect(page.locator('.brand-intro')).toHaveCount(0);await expect(page.locator('.login-story-copy h1')).toHaveCSS('animation-name','login-reveal');

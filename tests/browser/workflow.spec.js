@@ -1,10 +1,10 @@
 import {nextStep} from './helpers.js';
 import { test, expect } from '@playwright/test';
 const seedPraises = Array.from({length:4},(_,i)=>({id:'s'+(i+1),to:0,from:8,category:'thanks',design:'thanks',message:'서로의 이야기를 들어주셔서 정말 감사합니다. 함께해서 든든합니다.',date:new Date().toISOString()}));
-test.beforeEach(async({page})=>{await page.goto('/');await expect(page.locator('.login-page')).toHaveJSProperty('inert',false);await page.locator('#login-id').fill('c123456');await page.locator('#login-pw').fill('demo1234');await page.getByRole('button',{name:'로그인',exact:true}).click();await expect(page.locator('#praise-wizard')).toBeVisible();});
+test.beforeEach(async({page})=>{await page.goto('/');await expect(page.locator('.login-page')).toHaveJSProperty('inert',false);await page.locator('#login-id').fill('c123456');await page.locator('#login-pw').fill('demo1234');await page.getByRole('button',{name:'로그인',exact:true}).click();await expect(page.locator('.home-intro')).toBeVisible();await page.locator('.sidebar [data-nav="send"]').click();await expect(page.locator('#praise-wizard')).toBeVisible();});
 test('search, live preview, send, persist, and profile reward update',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto('/');
+ await page.goto('/#send');
  await page.locator('#wizard-next').click();
  await expect(page.locator('#wizard-error')).toContainText('동료를 선택');
  await page.locator('#dept-search').fill('회원유치지원팀');
@@ -29,8 +29,8 @@ test('search, live preview, send, persist, and profile reward update',async({pag
  await page.locator('[data-nav="profile"]').first().click();
  await page.locator('#profile-search').fill('김가연');
  await page.locator('[data-profile-person="8"]').click();
- await expect(page.locator('.temperature-stat strong')).toContainText('1');
- await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','36.8');
+ await expect(page.locator('.temperature-stat strong')).toContainText('2');
+ await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','37.1');
  await expect(page.locator('.history-card').first()).toContainText('귀 기울여');
  await page.locator('[data-profile-tab="detail"]').click();
  await expect(page.locator('dd')).toContainText(['김가연','삼성카드 / 회원유치지원팀','프로','employee8@example.com','함께 일하는 동료의 마음을 응원합니다.']);
@@ -42,7 +42,7 @@ test('search, live preview, send, persist, and profile reward update',async({pag
  expect(errors).toEqual([]);
 });
 test('mobile layout and independent name search',async({page})=>{
- await page.setViewportSize({width:390,height:844});await page.goto('/');
+ await page.setViewportSize({width:390,height:844});await page.goto('/#send');
  await page.locator('#name-search').fill('정다운');
  await expect(page.locator('.employee-result')).toHaveCount(1);
  await page.locator('[data-employee="16"]').click();await nextStep(page,2);await page.locator('#praise-message').fill('동료에게 따뜻한 응원의 마음을 전합니다.');await nextStep(page,3);
@@ -52,12 +52,12 @@ test('mobile layout and independent name search',async({page})=>{
  await page.screenshot({path:'/tmp/maeum-mobile.png',fullPage:true});
 });
 test('desktop screenshot',async({page})=>{
- await page.setViewportSize({width:1440,height:1080});await page.goto('/');await page.evaluate(()=>document.fonts.ready);
+ await page.setViewportSize({width:1440,height:1080});await page.goto('/#send');await page.evaluate(()=>document.fonts.ready);
  await page.screenshot({path:'/tmp/maeum-desktop.png',fullPage:true});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 test('incoming praise updates personal jelly balance and temperature',async({page})=>{
- await page.goto('/');
+ await page.goto('/#send');
  await page.evaluate(seed=>{const existing=JSON.parse(localStorage.getItem('maeum-praises-v2')||'null')||[];localStorage.setItem('maeum-praises-v2',JSON.stringify([{id:'incoming-demo',to:Number(sessionStorage.getItem('maeum-session-v2')),from:8,category:'thanks',design:'thanks',message:'프로젝트를 꼼꼼히 챙겨주셔서 정말 감사합니다.',date:new Date().toISOString()},...existing]));},seedPraises);
  await page.goto('/#my');await page.reload();
  await expect(page.locator('.jelly-stat')).toHaveCount(0);
@@ -71,7 +71,7 @@ test('incoming praise updates personal jelly balance and temperature',async({pag
 });
 test('praise highlights slide left, pause, open detail, and respect reduced motion',async({page})=>{
  await page.evaluate(seed=>localStorage.setItem('maeum-praises-v2',JSON.stringify(seed.map(p=>({...p,to:Number(sessionStorage.getItem('maeum-session-v2'))})))),seedPraises);
- await page.goto('/#send');await page.reload();
+ await page.goto('/#home');await page.reload();
  const cards=page.locator('.stream-card:not([aria-hidden])');
  await expect(cards).toHaveCount(4);
  const ids=await cards.evaluateAll(items=>items.map(x=>x.dataset.streamPraise));
@@ -93,8 +93,8 @@ test('praise highlights slide left, pause, open detail, and respect reduced moti
  await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 test('praise banner handles empty history and a single saved praise without changing totals',async({page})=>{
- await page.evaluate(()=>localStorage.setItem('maeum-praises-v2','[]'));await page.reload();
- await expect(page.locator('.praise-stream')).toHaveCount(0);await expect(page.locator('#wizard-next')).toBeVisible();
+ await page.goto('/#home');await page.evaluate(()=>localStorage.setItem('maeum-praises-v2','[]'));await page.reload();
+ await expect(page.locator('.praise-stream')).toHaveCount(0);await expect(page.locator('.home-empty')).toBeVisible();
  await page.evaluate(p=>localStorage.setItem('maeum-praises-v2',JSON.stringify([{...p,to:Number(sessionStorage.getItem('maeum-session-v2'))}])),seedPraises[0]);await page.reload();
  await expect(page.locator('.stream-card:not([aria-hidden])')).toHaveCount(1);
  await page.locator('[data-nav="my"]').first().click();await expect(page.locator('[data-my-tab="received"] span')).toHaveText('1');await expect(page.locator('.history-card')).toHaveCount(1);

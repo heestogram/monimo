@@ -1,4 +1,6 @@
-// Versioned storage intentionally starts a fresh demo without legacy praise records.
+import {seedPraises} from './data.js';
+// Existing account histories stay intact when introducing the welcome samples.
+export const SAMPLE_KEY = 'maeum-welcome-samples-v1';
 export const ACCOUNT_KEY = 'maeum-accounts-v2';
 export const PRAISE_KEY = 'maeum-praises-v2';
 export const SESSION_KEY = 'maeum-session-v2';
@@ -13,6 +15,14 @@ export function readPraises() {
  const stored = JSON.parse(localStorage.getItem(PRAISE_KEY) || '[]');
  if (!Array.isArray(stored)) throw new Error('Invalid praises');
  return stored;
+}
+export function ensureSamplePraises() {
+ if(localStorage.getItem(SAMPLE_KEY)==='complete')return;
+ const existing=readPraises();
+ const known=new Set(existing.map(praise=>praise.id));
+ const missing=seedPraises.filter(praise=>!known.has(praise.id));
+ localStorage.setItem(PRAISE_KEY,JSON.stringify([...existing,...missing]));
+ localStorage.setItem(SAMPLE_KEY,'complete');
 }
 export function resetLegacyData() {
  localStorage.removeItem('maeum-praises');
