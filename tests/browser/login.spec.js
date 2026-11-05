@@ -1,41 +1,70 @@
 import {test,expect} from '@playwright/test';
-test('landing login validation, protected navigation, persistence and logout',async({page})=>{
- await page.goto('/#profile');
- await expect(page.locator('#login-form')).toBeVisible();
- await expect(page.locator('#login-id')).toHaveAttribute('placeholder','c사번 입력');
- await expect(page.locator('#login-pw')).toHaveAttribute('type','password');
+async function login(page,id,pw='any-demo-password') {
+ await page.locator('#login-id').fill(id);await page.locator('#login-pw').fill(pw);
  await page.getByRole('button',{name:'로그인',exact:true}).click();
- await expect(page.getByRole('alert')).toContainText('모두 입력');
- await page.locator('#login-id').fill('c123456');await page.locator('#login-pw').fill('wrong');
- await page.getByRole('button',{name:'로그인',exact:true}).click();
- await expect(page.getByRole('alert')).toContainText('시연용');
- await page.locator('#login-pw').fill('demo1234');await page.locator('#login-pw').press('Enter');
  await expect(page.locator('#send-praise')).toBeVisible();
- await page.reload();await expect(page.locator('#send-praise')).toBeVisible();
- const storage=await page.evaluate(()=>JSON.stringify({local:{...localStorage},session:{...sessionStorage}}));
- expect(storage).not.toContain('demo1234');expect(storage).not.toContain('c123456');
- await page.locator('#logout').click();await expect(page.locator('#login-form')).toBeVisible();
- await page.goto('/#my');await expect(page.locator('#login-form')).toBeVisible();
+ return page.locator('.current-user strong').innerText();
+}
+async function send(page,recipient,text) {
+ await page.locator('#employee-select').selectOption(String(recipient));
+ await page.locator('#praise-message').fill(text);
+ await page.locator('#send-praise').click();await page.locator('#confirm-send').click();await page.locator('#view-sent').click();
+}
+test('arbitrary credentials, stable identity, isolated histories and received rewards survive a new session',async({page,context})=>{
+ await page.goto('/#profile');await expect(page.locator('#login-form')).toBeVisible();
+ await page.getByRole('button',{name:'로그인',exact:true}).click();await expect(page.getByRole('alert')).toContainText('모두 입력');
+ const nameA=await login(page,'c987654','first-password');
+ const idA=await page.evaluate(()=>sessionStorage.getItem('maeum-session-v2'));
+ await page.locator('[data-nav="my"]').first().click();
+ await expect(page.locator('.my-welcome')).toContainText('삼성카드 아이디어톤팀');
+ await expect(page.locator('.history-card')).toHaveCount(0);
+ await page.locator('[data-nav="send"]').first().click();
+ await send(page,8,'첫 번째 계정에서 동료에게 전하는 따뜻한 칭찬입니다.');
+ await expect(page.locator('.history-card')).toHaveCount(1);
+ await page.locator('#logout').click();const nameB=await login(page,'different-number');expect(nameB).not.toBe(nameA);
+ await page.locator('[data-nav="my"]').first().click();await page.locator('[data-my-tab="sent"]').click();
+ await expect(page.locator('.history-card')).toHaveCount(0);
+ await page.locator('[data-nav="send"]').first().click();
+ await send(page,idA,'첫 번째 가상 동료에게 응원의 마음을 전합니다.');
+ await page.locator('#logout').click();
+ await login(page,' C987654 ','entirely-different-password');
+ await expect(page.locator('.current-user strong')).toHaveText(nameA);
+ await page.locator('[data-nav="my"]').first().click();await expect(page.locator('.history-card')).toHaveCount(1);
+ await expect(page.locator('.history-card')).toContainText('응원의 마음');
+ await page.locator('[data-my-tab="jelly"]').click();await expect(page.locator('.jelly-row.total')).toContainText('1개');
+ await page.locator('#my-profile').click();await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow','36.8');
+ await expect(page.locator('.temperature-stat strong')).toHaveText('1번');
+ await page.locator('[data-nav="my"]').first().click();await page.locator('[data-my-tab="sent"]').click();
+ await expect(page.locator('.history-card')).toHaveCount(1);await expect(page.locator('.history-card')).toContainText('첫 번째 계정에서');
+ const storage=await page.evaluate(()=>JSON.stringify({...localStorage,...sessionStorage}));
+ for(const secret of ['first-password','entirely-different-password','c987654'])expect(storage).not.toContain(secret);
+ await page.close();const reopened=await context.newPage();await reopened.goto('/');
+ await expect(reopened.locator('#login-form')).toBeVisible();await login(reopened,'c987654');
+ await expect(reopened.locator('.current-user strong')).toHaveText(nameA);
+ await reopened.locator('[data-nav="my"]').first().click();await reopened.locator('[data-my-tab="sent"]').click();await expect(reopened.locator('.history-card')).toHaveCount(1);
 });
-test('login responsive layout and reward image',async({page})=>{
- await page.goto('/');await page.evaluate(()=>document.fonts.ready);
+test('legacy praises reset once while new cards persist',async({page})=>{
+ await page.goto('/');await page.evaluate(()=>{localStorage.setItem('maeum-praises',JSON.stringify([{id:'legacy',message:'OLD PRAISE'}]));sessionStorage.setItem('maeum-demo-session','active');});
+ await page.reload();await expect(page.locator('#login-form')).toBeVisible();await login(page,'new-user');
+ expect(await page.evaluate(()=>localStorage.getItem('maeum-praises'))).toBeNull();
+ await expect(page.locator('.praise-stream')).toHaveCount(0);
+ await send(page,1,'초기화 이후에 새롭게 저장한 칭찬은 계속 남아 있어요.');
+ await page.reload();await page.locator('[data-my-tab="sent"]').click();await expect(page.locator('.history-card')).toHaveCount(1);
+ await page.locator('[data-nav="profile"]').first().click();await page.locator('#profile-search').fill('김희준');await page.locator('[data-profile-person="1"]').click();
+ await expect(page.locator('.temperature-stat strong')).toHaveText('1번');await expect(page.locator('.history-card')).toHaveCount(1);
+});
+test('landing fades in, respects reduced motion and fits mobile',async({page})=>{
+ await page.goto('/');await expect(page.locator('.login-story-copy h1')).toHaveCSS('animation-name','login-reveal');
+ await expect(page.locator('.login-art')).toHaveCSS('animation-name','login-reveal');
+ await expect(page.locator('.login-art')).toHaveCSS('opacity','1');
  await page.setViewportSize({width:1440,height:1000});await page.screenshot({path:'/tmp/maeum-login-desktop.png',fullPage:true});
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/tmp/maeum-login-mobile.png',fullPage:true});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
- await page.locator('#login-id').fill('c123456');await page.locator('#login-pw').fill('demo1234');await page.getByRole('button',{name:'로그인',exact:true}).click();
- const image=page.locator('.reward-notice img');await expect(image).toBeVisible();expect(await image.evaluate(img=>img.complete&&img.naturalWidth>0)).toBe(true);
+ await page.emulateMedia({reducedMotion:'reduce'});await expect(page.locator('.login-art')).toHaveCSS('animation-name','none');await expect(page.locator('.login-art')).toHaveCSS('opacity','1');
+ await login(page,'mobile-user');const image=page.locator('.reward-notice img');expect(await image.evaluate(img=>img.complete&&img.naturalWidth>0)).toBe(true);
 });
-test('all profile counts match histories and jelly ledger has no hidden balance',async({page})=>{
- await page.goto('/');await page.locator('#login-id').fill('c123456');await page.locator('#login-pw').fill('demo1234');await page.getByRole('button',{name:'로그인',exact:true}).click();
- await page.locator('[data-nav="my"]').first().click();
- await expect(page.locator('.summary-stat')).toHaveCount(0);
- await expect(page.locator('.history-card')).toHaveCount(3);
- await page.locator('[data-filter="thanks"]').click();await expect(page.locator('.list-heading h2')).toContainText('1');await expect(page.locator('.history-card')).toHaveCount(1);
- await page.locator('[data-my-tab="jelly"]').click();await expect(page.locator('.jelly-row-title')).toHaveCount(3);await expect(page.locator('.jelly-row.total')).toContainText('3개');await expect(page.locator('.jelly-row.balance')).toHaveCount(0);
- await page.locator('[data-nav="profile"]').first().click();
- for(const [name,total] of [['김희준',3],['김가연',0],['박세연',0],['정다운',0],['장호준',0],['신성은',0]]){
-  await page.locator('#profile-search').fill(name);await page.locator('[data-profile-person]').click();
-  await expect(page.locator('.temperature-stat strong')).toHaveText(total+'번');await expect(page.locator('.history-card')).toHaveCount(total);
-  await expect(page.locator('[data-profile-tab="praise"] span')).toHaveText(String(total));
- }
+test('storage failure does not promise a saved account',async({page})=>{
+ await page.goto('/');await page.evaluate(()=>{Storage.prototype.setItem=()=>{throw new Error('blocked');};});
+ await page.locator('#login-id').fill('blocked-user');await page.locator('#login-pw').fill('anything');await page.getByRole('button',{name:'로그인',exact:true}).click();
+ await expect(page.getByRole('alert')).toContainText('저장하지 못했어요');await expect(page.locator('#login-form')).toBeVisible();
 });

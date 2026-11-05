@@ -111,3 +111,12 @@
  .history-body>p,.profile-content .history-body>p{font-size:15px}.card-message,.card-message.placeholder{font-size:15px}.preview-column .primary-button{font-size:15px}.reward-notice strong{font-size:13px}.reward-notice p{font-size:12px}.reward-notice .jelly-image{flex-shrink:0}.stream-card-content>p{font-size:13px;min-height:73px}.stream-card{min-height:198px}.stream-heading p{font-size:12px}.filter-row button{font-size:13px}.demo-notice{font-size:12px}.jelly-row-title strong{font-size:12px}.jelly-row>strong small{font-size:10px}.jelly-row-title{min-width:0}.jelly-row>strong{white-space:nowrap;margin-left:8px}
  body:has(select:focus) .mobile-compose-actions{display:none}
 }
+
+/* A gentle, staggered entrance; opacity only preserves the card's rotation and mobile scale. */
+@keyframes login-reveal{from{opacity:0}to{opacity:1}}
+.login-eyebrow{animation:login-reveal 1.1s ease-out .1s both}
+.login-story-copy h1{animation:login-reveal 1.4s ease-out .25s both}
+.login-story-copy p{animation:login-reveal 1.4s ease-out .55s both}
+.login-art{animation:login-reveal 1.8s ease-out .65s both}
+.login-story-footer{animation:login-reveal 1.4s ease-out .85s both}
+@media(prefers-reduced-motion:reduce){.login-story-copy>* , .login-art,.login-story-footer{animation:none;opacity:1}}
