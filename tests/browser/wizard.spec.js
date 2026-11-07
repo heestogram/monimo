@@ -50,3 +50,33 @@ test('intro grows MO on white, moves to the corner, reveals login and does not r
  await expect(page.locator('.brand-intro')).toHaveCount(0);await expect(page.locator('#login-id')).toBeEditable();
  await page.emulateMedia({reducedMotion:'reduce'});await page.reload();await expect(page.locator('.brand-intro')).toHaveCount(0);await expect(page.locator('.login-page')).toHaveJSProperty('inert',false);
 });
+test('composer actions fit on desktop and phone screens without page scrolling',async({page})=>{
+ await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');
+ await page.locator('#login-id').fill('compact-demo');await page.locator('#login-pw').fill('demo');await page.locator('.login-submit').click();
+ await expect(page.getByText('‘예시 칭찬’은 12명의 프로에게',{exact:false})).toHaveCount(0);
+ await page.locator('.sidebar [data-nav="send"]').click();
+ const sizes=[{width:1366,height:768},{width:1024,height:768},{width:390,height:844},{width:360,height:740},{width:360,height:640}];
+ for(let step=1;step<=4;step++){
+  for(const size of sizes){
+   await page.setViewportSize(size);await page.evaluate(()=>window.scrollTo(0,0));
+   const layout=await page.evaluate(()=>{
+    const actions=document.querySelector('.wizard-actions').getBoundingClientRect();
+    const nav=document.querySelector('.sidebar nav').getBoundingClientRect();
+    const stage=document.getElementById('wizard-stage');
+    return {pageHeight:document.documentElement.scrollHeight,pageWidth:document.documentElement.scrollWidth,viewport:innerHeight,width:innerWidth,actionsBottom:actions.bottom,navTop:innerWidth<=720?nav.top:innerHeight,stageOverflow:stage.scrollHeight-stage.clientHeight};
+   });
+   expect(layout.pageHeight,`step ${step}, ${size.width}x${size.height}: ${JSON.stringify(layout)}`).toBeLessThanOrEqual(size.height+1);
+   expect(layout.pageWidth).toBeLessThanOrEqual(size.width);
+   expect(layout.actionsBottom).toBeLessThanOrEqual(layout.navTop);
+   if(size.height>=740)expect(layout.stageOverflow,`step ${step}, ${size.width}x${size.height}`).toBeLessThanOrEqual(2);
+   if(size.width===390)await page.screenshot({path:`/tmp/maeum-compact-${step}.png`});
+  }
+  if(step===1)await page.locator('#employee-select').selectOption('7');
+  if(step===2)await page.locator('#praise-message').fill('함께 고민하고 도와주셔서 고마워요. 덕분에 큰 힘이 됐어요!');
+  if(step<4)await nextStep(page,step+1);
+ }
+ // A long message remains fully available by scrolling its own text area.
+ await previousStep(page,3);await previousStep(page,2);await page.locator('#praise-message').fill('고맙습니다. '.repeat(37));await nextStep(page,3);await nextStep(page,4);
+ await expect(page.locator('.card-message')).toHaveText('고맙습니다. '.repeat(37).trim());
+ await expect(page.locator('#send-praise')).toBeInViewport();
+});

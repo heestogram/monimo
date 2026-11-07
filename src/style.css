@@ -173,3 +173,159 @@
  .topbar .breadcrumb{white-space:nowrap;flex-shrink:0;font-size:10px;gap:6px}.topbar .current-user>span:not(.avatar){max-width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.topbar .current-user{gap:5px}.topbar{padding-left:16px;padding-right:12px}.topbar .top-actions{gap:2px}.topbar .notification,.topbar .logout-button{min-width:32px}.topbar .current-user .avatar{width:26px;height:26px}
 }
 @media(max-width:720px){.home-intro-art{right:10px;top:32px;transform:scale(.42);transform-origin:top right}}
+
+/* Fit each composing step to the available screen, keeping actions in view. */
+body.compose-view .topbar{height:60px}
+body.compose-view main{padding:18px 24px 22px;max-width:1200px;width:100%}
+body.compose-view .page-heading,body.compose-view .page-footer,body.compose-view main>.demo-notice{display:none}
+body.compose-view .praise-wizard{height:calc(100dvh - 100px);min-height:460px;width:100%;max-width:900px;padding:20px 26px 16px;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;scroll-margin-top:18px}
+body.compose-view .wizard-topline{margin-bottom:16px}
+body.compose-view .wizard-progress{margin-bottom:18px}
+body.compose-view .wizard-progress li{padding-bottom:12px}
+body.compose-view .wizard-stage{min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:2px}
+body.compose-view .wizard-panel .section-heading h2{font-size:21px;line-height:1.45}
+body.compose-view .wizard-panel .section-heading p{font-size:12px;margin-top:4px;line-height:1.6}
+body.compose-view .wizard-panel .search-fields{margin-top:20px}
+body.compose-view .wizard-panel .category-options{margin-top:18px}
+body.compose-view .wizard-panel .category-option{padding:10px 6px;min-height:78px;gap:4px}
+body.compose-view .wizard-panel .message-label{margin:16px 0 8px}
+body.compose-view .wizard-panel .textarea-wrap{padding:12px}
+body.compose-view .wizard-panel .textarea-wrap textarea{min-height:105px;height:clamp(105px,19dvh,160px);resize:none;font-size:16px}
+body.compose-view .wizard-panel .design-options{margin-top:20px;gap:12px}
+body.compose-view .wizard-panel .design-art{height:clamp(125px,23dvh,190px);padding-top:12px}
+body.compose-view .wizard-panel .design-art .mascot{width:clamp(110px,18dvh,150px)}
+body.compose-view .wizard-panel .design-name{margin-top:7px;font-size:13px}
+body.compose-view .wizard-error{min-height:0;margin:0;font-size:12px}
+body.compose-view .wizard-error:not(:empty){padding-top:6px}
+body.compose-view .wizard-actions{margin-top:12px;padding-top:12px}
+body.compose-view .wizard-actions button{min-height:44px;padding:12px 16px}
+body.compose-view .wizard-review .review-card{max-width:620px;margin:14px auto 0}
+body.compose-view .wizard-review .praise-preview{padding:16px 20px 12px;text-align:left;display:grid;grid-template-columns:150px minmax(0,1fr);column-gap:16px;align-items:center}
+body.compose-view .wizard-review .card-overline{grid-column:1/-1;font-size:7px}
+body.compose-view .wizard-review .praise-preview h3{grid-column:1/-1;font-size:23px;margin:6px 0 2px}
+body.compose-view .wizard-review .card-subtitle{grid-column:1/-1;font-size:11px;margin-bottom:10px}
+body.compose-view .wizard-review .preview-mascot{grid-column:1;grid-row:4;width:140px;height:140px;margin:0}
+body.compose-view .wizard-review .card-paper{grid-column:2;grid-row:4;min-height:0;padding:14px}
+body.compose-view .wizard-review .card-to,body.compose-view .wizard-review .card-to strong{font-size:12px}
+body.compose-view .wizard-review .preview-category{margin-top:8px}
+body.compose-view .wizard-review .card-message{font-size:13px;line-height:1.7;margin:8px 0 10px;min-height:0;max-height:102px;overflow:auto;scrollbar-width:thin}
+body.compose-view .wizard-review .card-from{padding-top:8px}
+body.compose-view .wizard-review .card-brand{grid-column:1/-1;text-align:center;font-size:10px;margin-top:8px}
+body.compose-view .wizard-review .card-decoration{display:none}
+body.compose-view .wizard-review .reward-notice{padding:9px 12px;margin-top:10px}
+body.compose-view .wizard-review .reward-notice p{display:none}
+body.compose-view .wizard-review .send-footnote{font-size:10px;margin-top:6px;line-height:1.6}
+@media(max-width:720px){
+ body.compose-view .sidebar{height:64px;padding:11px 18px 10px}
+ body.compose-view .sidebar .brand{margin:0;height:42px}
+ body.compose-view .topbar{height:44px}
+ body.compose-view .main-wrap{min-height:calc(100dvh - 64px);padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
+ body.compose-view main{padding:10px}
+ body.compose-view .praise-wizard{height:calc(100dvh - 198px - env(safe-area-inset-bottom,0px));min-height:410px;border-radius:14px;padding:14px 14px 12px;scroll-margin-top:10px}
+ body.compose-view .wizard-topline{margin-bottom:10px}
+ body.compose-view .wizard-topline .soft-blue-label{font-size:10px}
+ body.compose-view .wizard-progress{margin-bottom:12px;gap:7px}
+ body.compose-view .wizard-progress li{flex-direction:row;justify-content:center;gap:5px;padding-bottom:9px}
+ body.compose-view .wizard-progress li>span{width:20px;height:20px;font-size:10px}
+ body.compose-view .wizard-progress strong{font-size:10px;letter-spacing:-.5px}
+ body.compose-view .wizard-panel .section-heading{gap:7px}
+ body.compose-view .wizard-panel .section-heading h2{font-size:17px;line-height:1.5}
+ body.compose-view .wizard-panel .section-heading p{font-size:11px;line-height:1.6;margin-top:3px;word-break:keep-all}
+ body.compose-view .wizard-panel .number{width:23px;height:23px;font-size:10px;border-radius:7px}
+ body.compose-view .wizard-panel .search-fields{grid-template-columns:1fr 1fr;gap:11px;margin-top:16px}
+ body.compose-view .wizard-panel .directory-label{grid-column:1/-1}
+ body.compose-view .wizard-panel .search-fields label{font-size:12px}
+ body.compose-view .wizard-panel .input-wrap{min-height:44px;padding:0 8px;gap:5px;margin-top:6px}
+ body.compose-view .wizard-panel .input-wrap input{height:43px;font-size:16px}
+ body.compose-view .wizard-panel .input-wrap input::placeholder{font-size:11px}
+ body.compose-view .wizard-panel .input-wrap select{min-height:43px;font-size:13px}
+ body.compose-view .wizard-panel .input-wrap .icon{width:14px;height:14px}
+ body.compose-view .wizard-panel .selected-person{padding:6px 8px;margin-top:10px;gap:6px}
+ body.compose-view .wizard-panel .search-hint{font-size:11px;margin-top:10px}
+ body.compose-view .wizard-panel .search-results{max-height:150px}
+ body.compose-view .wizard-panel .employee-result{min-height:48px;padding:8px 4px}
+ body.compose-view .wizard-panel .category-options{margin-top:12px;gap:5px}
+ body.compose-view .wizard-panel .category-option{min-height:65px;padding:9px 2px 7px;gap:4px}
+ body.compose-view .wizard-panel .category-option>span{font-size:20px;height:25px;line-height:25px}
+ body.compose-view .wizard-panel .category-option strong{font-size:10px}
+ body.compose-view .wizard-panel .message-label{font-size:12px;margin:12px 0 6px}
+ body.compose-view .wizard-panel .textarea-wrap{padding:10px}
+ body.compose-view .wizard-panel .textarea-wrap textarea{min-height:85px;height:clamp(85px,16dvh,140px);font-size:16px;line-height:1.65}
+ body.compose-view .wizard-panel .textarea-wrap textarea::placeholder{font-size:13px}
+ body.compose-view .wizard-panel .message-counter{font-size:9px;margin-top:5px}
+ body.compose-view .wizard-panel .message-counter>span:first-child{max-width:70%}
+ body.compose-view .wizard-panel .design-options{gap:12px 10px;margin-top:14px}
+ body.compose-view .wizard-panel .design-art{height:clamp(90px,15dvh,130px);padding-top:7px}
+ body.compose-view .wizard-panel .design-art .mascot{width:clamp(76px,12dvh,105px)}
+ body.compose-view .wizard-panel .mini-card-title{font-size:11px}
+ body.compose-view .wizard-panel .design-name{font-size:12px;margin-top:5px}
+ body.compose-view .wizard-actions{margin-top:8px;padding-top:10px}
+ body.compose-view .wizard-actions button{min-height:44px;padding:10px 14px;font-size:13px}
+ body.compose-view .wizard-review .review-card{margin-top:10px}
+ body.compose-view .wizard-review .praise-preview{display:block;text-align:center;padding:10px 12px 8px}
+ body.compose-view .wizard-review .card-overline,body.compose-view .wizard-review .card-subtitle{display:none}
+ body.compose-view .wizard-review .praise-preview h3{font-size:19px;text-align:left;min-height:56px;margin:4px 60px 5px 0;display:flex;align-items:center;line-height:1.4;letter-spacing:-.8px}
+ body.compose-view .wizard-review .preview-mascot{position:absolute;right:10px;top:8px;width:66px;height:65px;margin:0}
+ body.compose-view .wizard-review .card-paper{padding:10px 12px}
+ body.compose-view .wizard-review .card-to,body.compose-view .wizard-review .card-to strong{font-size:12px}
+ body.compose-view .wizard-review .preview-category{margin-top:5px}
+ body.compose-view .wizard-review .card-message{font-size:13px;line-height:1.65;margin:6px 0 8px;max-height:86px}
+ body.compose-view .wizard-review .card-from,body.compose-view .wizard-review .card-from strong{font-size:10px}
+ body.compose-view .wizard-review .card-from{padding-top:6px;flex-wrap:wrap;gap:3px}
+ body.compose-view .wizard-review .card-brand{font-size:9px;margin-top:6px}
+ body.compose-view .wizard-review .reward-notice{margin-top:7px;padding:6px 8px;gap:6px}
+ body.compose-view .wizard-review .reward-notice strong{font-size:11px;line-height:1.5}
+ body.compose-view .wizard-review .reward-notice .jelly-image{width:22px;height:25px}
+ body.compose-view .wizard-review .send-footnote{font-size:9px;margin-top:4px;line-height:1.5}
+}
+
+/* Wrap Korean copy at word boundaries and keep identities intact. */
+.person-name,.person-suffix{display:inline-block;white-space:nowrap}
+.my-summary,.profile-panel,.history-card,.jelly-panel{word-break:keep-all;overflow-wrap:break-word}
+.my-welcome{min-width:0}.my-welcome>div{min-width:0;flex:1}
+.my-welcome .welcome-title{display:flex;align-items:baseline;flex-wrap:wrap;gap:0 .25em}
+.my-welcome .welcome-message{display:block;text-wrap:pretty}
+.my-welcome .person-suffix{font-size:.85em}
+.my-welcome>div>span{display:inline-block;line-height:1.7}
+.page-heading{gap:16px}.page-heading>div{min-width:0}.page-heading>.compact{flex-shrink:0;white-space:nowrap}
+.page-heading p,.empty-state p,.schedule-view p{word-break:keep-all;overflow-wrap:break-word;text-wrap:pretty}
+.profile-person{flex:1;min-width:0}
+.profile-person .profile-organization{display:flex;flex-wrap:wrap;align-items:center;gap:3px 9px;line-height:1.7}
+.profile-organization>span{display:inline-block;white-space:nowrap}
+.profile-person h2{display:flex;align-items:baseline;flex-wrap:wrap;column-gap:7px;row-gap:2px;line-height:1.4}
+.profile-person h2 small{white-space:nowrap;margin-left:0}
+.profile-person p{word-break:keep-all;overflow-wrap:break-word;line-height:1.8;text-wrap:pretty}
+.profile-header>button{flex-shrink:0;white-space:nowrap}
+.profile-contact{flex-wrap:wrap;gap:8px 18px;line-height:1.8}
+.profile-contact>.contact-item{display:inline-flex;align-items:flex-start;gap:7px;padding:0;min-width:0;max-width:100%}
+.profile-contact .icon{margin-top:4px}
+.profile-contact .contact-value{min-width:0;overflow-wrap:anywhere}
+.profile-contact .contact-department{white-space:nowrap}
+.temperature-copy{min-width:0;flex:1}.temperature-copy h3{line-height:1.6;word-break:keep-all;text-wrap:pretty}
+.temperature-copy>p,.temperature-stat>p{word-break:keep-all;line-height:1.7}
+.history-top{gap:8px;flex-wrap:wrap}.history-top time{white-space:nowrap}
+.history-body>p,.profile-content .history-body>p{white-space:pre-wrap;word-break:keep-all;overflow-wrap:break-word;text-wrap:pretty}
+.history-person{flex-wrap:wrap;gap:8px;min-width:0}
+.history-person>span:not(.avatar):not(.to-person){flex:1 1 130px;min-width:0;line-height:1.6}
+.history-person strong{line-height:1.6}.history-person strong small{display:inline-block;white-space:nowrap}
+.history-person .to-person{max-width:100%;white-space:nowrap;line-height:1.6}
+.details-grid dt{flex-shrink:0}.details-grid dd{min-width:0;word-break:keep-all;overflow-wrap:break-word;line-height:1.8}
+.details-grid dl>div:nth-child(4) dd{overflow-wrap:anywhere}
+.jelly-row{gap:10px}.jelly-row-title>span{min-width:0}.jelly-row-title strong{line-height:1.7;word-break:keep-all;overflow-wrap:break-word}
+.jelly-panel .list-heading{gap:10px;flex-wrap:wrap}.jelly-panel .list-heading>span{white-space:nowrap}
+@media(max-width:720px){
+ .page-heading{flex-wrap:wrap;gap:12px}.page-heading>div{flex:1 1 220px}.page-heading>.compact{min-height:42px;margin-left:auto}
+ .my-summary{padding:22px 17px}.my-welcome{align-items:flex-start;gap:12px}.my-welcome .avatar{width:52px;height:52px;font-size:22px;border-width:3px;border-radius:19px}
+ .my-welcome h2{font-size:19px;line-height:1.6;letter-spacing:-.5px}.my-welcome>div>span{font-size:12px}.my-welcome .text-link{white-space:normal;word-break:keep-all;line-height:1.7}
+ .profile-header{display:grid;grid-template-columns:62px minmax(0,1fr);gap:12px;margin:-24px 18px 0;align-items:start}
+ .profile-header .profile-avatar{width:62px!important;height:62px!important;font-size:23px!important;border-width:4px!important;border-radius:21px!important}
+ .profile-person{padding-top:33px;min-width:0}.profile-person h2{font-size:21px;letter-spacing:-.7px}.profile-person .profile-organization{font-size:12px;gap:2px 8px}.profile-person p{font-size:12px;margin-top:9px;line-height:1.8}
+ .profile-header>button{grid-column:2;justify-self:start;margin:0;max-width:100%;min-height:42px;font-size:12px}
+ .profile-contact{margin:17px 18px;gap:8px 14px;font-size:12px}.profile-contact>.contact-item{display:inline-flex}
+ .temperature-panel{padding:17px}.temperature-copy h3{font-size:17px}.temperature-stat{flex-wrap:wrap;gap:8px}.temperature-stat>p{font-size:11px}
+ .details-grid dl>div{gap:10px;padding:17px 0}.details-grid dt{width:55px}
+ .history-person>span:not(.avatar):not(.to-person){flex-basis:125px}
+ .jelly-row{padding-left:0;padding-right:0;gap:8px}.jelly-row>strong{flex-shrink:0;margin-left:0}
+}
+@media(max-width:359px){.my-welcome h2{font-size:17px}.profile-person h2{font-size:18px}.profile-header{grid-template-columns:52px minmax(0,1fr);gap:10px}.profile-header .profile-avatar{width:52px!important;height:52px!important}.profile-organization>span{font-size:11px}}
+@media(max-width:359px){.topbar .current-user .avatar{display:none}.topbar .current-user>span:not(.avatar){max-width:80px}}
